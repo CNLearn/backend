@@ -20,6 +20,8 @@ async def open_postgres_database_connection(app: FastAPI) -> None:
         engine, expire_on_commit=False, class_=AsyncSession
     )
     try:
+        async with async_session() as session:
+            await session.execute("SELECT 1")
         app.state._db = async_session
         logging.info("You have connected to the database")
     except Exception as e:
