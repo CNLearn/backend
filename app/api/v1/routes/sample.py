@@ -12,6 +12,6 @@ async def get_words() -> List[Dict[str, Union[int, str]]]:
     """
     words = [
         {"id": 1, "simplified": "好", "pinyin": "hǎo", "definitions": "good"},
-        {"id": 2, "simplifieid": "不", "pinyin": "bù", "definitions": "no"}
+        {"id": 2, "simplified": "不", "pinyin": "bù", "definitions": "no"}
     ]
     return words

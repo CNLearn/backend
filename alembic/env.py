@@ -1,6 +1,8 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
+
+from sqlalchemy import engine_from_config, pool
+from psycopg2 import DatabaseError
 from sqlalchemy import pool
 
 from alembic import context
@@ -44,6 +46,9 @@ def run_migrations_offline():
 
     """
     url = get_url()
+    if settings.TESTING:
+        raise DatabaseError("Running testing migrations offline currently not permitted.")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,12 +68,18 @@ def run_migrations_online():
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = get_url()
-    connectable = engine_from_config(
-        configuration,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    database_url: str = get_url()
+    if settings.TESTING:
+        database_url += "_testing"
+    configuration["sqlalchemy.url"] = database_url
+    connectable = config.attributes.get("connection", None)
+    if connectable is None:
+        connectable = engine_from_config(
+            configuration,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+            isolation_level="AUTOCOMMIT"
+        )
 
     with connectable.connect() as connection:
         context.configure(

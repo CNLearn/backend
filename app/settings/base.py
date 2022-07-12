@@ -1,6 +1,6 @@
 import secrets
 from typing import Any, Dict, List, Optional
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
+from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator, EmailStr
 
 
 class Settings(BaseSettings):
@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str
     POSTGRES_DB: str
     POSTGRES_PORT: int
+    TESTING: int = 0  # if this is 1, we will connect to the testing database
     SQLALCHEMY_POSTGRES_URI: Optional[PostgresDsn] = None
     # if the last one is None, let's build it ourselves
 
@@ -28,14 +29,24 @@ class Settings(BaseSettings):
     def create_postgres_uri(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
+
+        postgres_db_name: str = values.get("POSTGRES_DB", "")
         return PostgresDsn.build(
             scheme="postgresql",
             user=values.get("POSTGRES_USER"),
             password=values.get("POSTGRESS_PASSWORD"),
             host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
+            path=f"/{postgres_db_name}",
             port=f"{values.get('POSTGRES_PORT')}",
         )
+
+
+    # password settings
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+
+    # superuser settings
+    FIRST_SUPERUSER: EmailStr
+    FIRST_SUPERUSER_PASSWORD: str
 
     class Config:
         case_sensitive = True
@@ -44,6 +55,12 @@ class Settings(BaseSettings):
 class DevSettings(Settings):
     class Config:
         env_file = '.dev.env'
+        env_file_encoding = 'utf-8'
+
+
+class TestSettings(Settings):
+    class Config:
+        env_file = '.test.env'
         env_file_encoding = 'utf-8'
 
 
