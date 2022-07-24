@@ -1,6 +1,4 @@
-import pytest
-
-from app.core.security import verify_password, get_password_hash
+from app.core.security import get_password_hash, verify_password
 
 
 def test_verify_password():

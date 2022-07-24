@@ -1,9 +1,11 @@
 from sqlalchemy import Boolean, Column, Integer, String
+
 from app.db.base import Base
+
 
 class User(Base):
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, index=True)

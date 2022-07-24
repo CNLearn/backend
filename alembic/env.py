@@ -1,12 +1,9 @@
 from logging.config import fileConfig
 
-
-from sqlalchemy import engine_from_config, pool
 from psycopg2 import DatabaseError
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
 from app.settings.base import settings
 
 # this is the Alembic Config object, which provides
@@ -28,9 +25,9 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+
 def get_url():
     return settings.SQLALCHEMY_POSTGRES_URI
-
 
 
 def run_migrations_offline():
@@ -75,16 +72,11 @@ def run_migrations_online():
     connectable = config.attributes.get("connection", None)
     if connectable is None:
         connectable = engine_from_config(
-            configuration,
-            prefix="sqlalchemy.",
-            poolclass=pool.NullPool,
-            isolation_level="AUTOCOMMIT"
+            configuration, prefix="sqlalchemy.", poolclass=pool.NullPool, isolation_level="AUTOCOMMIT"
         )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata, compare_type=True
-        )
+        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
 
         with context.begin_transaction():
             context.run_migrations()

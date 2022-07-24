@@ -1,12 +1,13 @@
 from typing import Callable, Optional
 from unittest import mock
 
-from sqlalchemy.ext.asyncio import AsyncSession
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import schemas
 from app.crud import user
 from app.models.user import User
-from app import schemas
+
 
 @mock.patch("app.crud.crud_user.verify_password")
 @mock.patch("app.crud.crud_user.get_password_hash")
@@ -17,7 +18,7 @@ async def test_crud_user(
     get_async_session: AsyncSession,
     user_schema: Callable[..., schemas.UserCreate],
 ):
-    # let's first call user get with nothing in there    
+    # let's first call user get with nothing in there
     no_user: Optional[User] = await user.get(get_async_session, id=1)
     assert no_user is None
 
@@ -27,8 +28,8 @@ async def test_crud_user(
     assert new_user.email == "user@email.com"
     assert new_user.full_name == "Fake Name"
     assert new_user.hashed_password == "MockedPassword"
-    assert new_user.is_active == True
-    assert new_user.is_superuser == False
+    assert new_user.is_active
+    assert not new_user.is_superuser
 
     # let's get the new_user.id since that can vary depending on what other tests ran first
     user_id: int = new_user.id
@@ -52,7 +53,6 @@ async def test_crud_user(
     updated_user: User = await user.update(get_async_session, db_obj=updated_user, obj_in=user_schema_in)
     assert updated_user.hashed_password == "MockedPassword2"
 
-
     # do you think we can find you by email? let's see
     user_by_email: Optional[User] = await user.get_by_email(get_async_session, email="newuser@email.com")
     assert isinstance(user_by_email, User)
@@ -67,22 +67,34 @@ async def test_crud_user(
     assert await user.is_superuser(updated_user) is False
 
     # let's log our user in. we will enter an email that does not exist first
-    no_logged_in_user: Optional[User] = await user.authenticate(get_async_session, email="fake@email.com", password="asd")
+    no_logged_in_user: Optional[User] = await user.authenticate(
+        get_async_session,
+        email="fake@email.com",
+        password="asd",
+    )
     assert no_logged_in_user is None
 
     # ok now we forgot our password momentarily
     mocked_verify_password.return_value = False
-    incorrect_password_no_user: Optional[User] = await user.authenticate(get_async_session, email="newuser@email.com", password="asd")
+    incorrect_password_no_user: Optional[User] = await user.authenticate(
+        get_async_session,
+        email="newuser@email.com",
+        password="asd",
+    )
     assert incorrect_password_no_user is None
     assert mocked_verify_password.called
 
     # ooooh I remember the password now
     mocked_verify_password.return_value = True
-    correct_password_user: Optional[User] = await user.authenticate(get_async_session, email="newuser@email.com", password="doesntmatter")
+    correct_password_user: Optional[User] = await user.authenticate(
+        get_async_session,
+        email="newuser@email.com",
+        password="doesntmatter",
+    )
     assert isinstance(correct_password_user, User)
     assert mocked_verify_password.called
 
-    # you want to leave us? :( well, I am sorry to hear that 
+    # you want to leave us? :( well, I am sorry to hear that
     removed_user: Optional[User] = await user.remove(get_async_session, id=user_id)
     assert isinstance(removed_user, User)
     # let's check that there's no one left

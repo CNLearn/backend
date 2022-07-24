@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+
 from app.api.v1.api import api_router
 from app.settings.base import settings
-from app.tasks.startup import database_start_app_handler
 from app.tasks.shutdown import database_stop_app_handler
+from app.tasks.startup import database_start_app_handler
 
 
 def create_application():

@@ -1,8 +1,8 @@
-from typing import Callable, Any
+from typing import Any, Callable
 
+import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
-import pytest
 
 
 @pytest.mark.asyncio
@@ -14,7 +14,7 @@ async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table:
             "password": "interesting",
             "email": "unique@email.com",
             "full_name": "Uniquely Interesting",
-        }
+        },
     )
     json_response: dict[str, Any] = response.json()
     assert json_response["email"] == "unique@email.com"

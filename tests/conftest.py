@@ -1,16 +1,15 @@
 import os
 
-import alembic
-from alembic.config import Config
+import pytest
+import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient
-import pytest
-import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.engine.cursor import CursorResult
 from sqlalchemy import delete
+from sqlalchemy.ext.asyncio import AsyncSession
 
+import alembic
+from alembic.config import Config
 from app.models.user import User
 
 
@@ -28,6 +27,7 @@ def apply_migrations():
 @pytest.fixture(scope="session")
 def app(apply_migrations: None) -> FastAPI:
     from app.server import create_application
+
     return create_application()
 
 
@@ -35,9 +35,7 @@ def app(apply_migrations: None) -> FastAPI:
 async def client(app: FastAPI) -> AsyncClient:
     async with LifespanManager(app):
         async with AsyncClient(
-            app=app,
-            base_url="http://testserver",
-            headers={"Content-Type": "application/json"}
+            app=app, base_url="http://testserver", headers={"Content-Type": "application/json"}
         ) as client:
             yield client
 
@@ -53,5 +51,5 @@ async def get_async_session(client: AsyncClient, app: FastAPI) -> AsyncSession:
 async def clean_users_table(get_async_session: AsyncSession):
     yield
     db: AsyncSession = get_async_session
-    users_deleted: CursorResult = await db.execute(delete(User))
+    await db.execute(delete(User))
     await db.commit()

@@ -1,13 +1,10 @@
-
-from sqlalchemy.orm.session import sessionmaker
-from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker, close_all_sessions
 import logging
 
+from fastapi import FastAPI
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import close_all_sessions, sessionmaker
+
 from app.settings.base import settings
-from app import crud, schemas
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +12,11 @@ logger = logging.getLogger(__name__)
 async def open_postgres_database_connection(app: FastAPI) -> None:
     # these are configured in the settings module
 
-    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI.replace(
-        "postgresql", "postgresql+asyncpg", 1)
+    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI.replace("postgresql", "postgresql+asyncpg", 1)
     if settings.TESTING:
         ASYNC_URI += "_testing"
     engine = create_async_engine(ASYNC_URI, echo=False)
-    async_session = sessionmaker(
-        engine, expire_on_commit=False, class_=AsyncSession
-    )
+    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     try:
         app.state._db = async_session
         logging.info("You have connected to the database")
