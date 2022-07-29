@@ -12,6 +12,7 @@ from app.schemas.user import UserCreate, UserUpdate
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     async def get_by_email(self, db: AsyncSession, *, email: str) -> Optional[User]:
         result = await db.execute(select(User).where(User.email == email))
+        print(result)
         return result.scalars().first()
 
     async def create(self, db: AsyncSession, *, obj_in: UserCreate) -> User:
@@ -45,10 +46,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None
         return user
 
-    async def is_active(self, user: User) -> bool:
+    def is_active(self, user: User) -> bool:
         return user.is_active
 
-    async def is_superuser(self, user: User) -> bool:
+    def is_superuser(self, user: User) -> bool:
         return user.is_superuser
 
 
