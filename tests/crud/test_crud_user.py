@@ -63,8 +63,8 @@ async def test_crud_user(
     assert user_no_such_email is None
 
     # let's check whether the user is active and is a superuser. by default, it will be True and False respectively
-    assert await user.is_active(updated_user) is True
-    assert await user.is_superuser(updated_user) is False
+    assert user.is_active(updated_user) is True
+    assert user.is_superuser(updated_user) is False
 
     # let's log our user in. we will enter an email that does not exist first
     no_logged_in_user: Optional[User] = await user.authenticate(
