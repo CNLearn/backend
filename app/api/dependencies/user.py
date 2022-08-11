@@ -16,12 +16,9 @@ reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/login/ac
 async def get_current_user(
     db: AsyncSession = Depends(database.get_async_session), token: str = Depends(reusable_oauth2)
 ) -> User:
-    print(token)
     try:
         payload = security.decode_access_token(token)
-        print(payload)
         token_data = schemas.TokenPayload(**payload)
-        print(token_data)
     except (JWTError, ExpiredSignatureError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

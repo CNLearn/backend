@@ -13,7 +13,7 @@ from app.settings.base import settings
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/login/access-token", response_model=schemas.Token, name="user:access-token")
 async def login_access_token(
     db: Session = Depends(database.get_async_session), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -32,6 +32,6 @@ async def login_access_token(
     }
 
 
-@router.get("/login/me")
+@router.get("/login/me", response_model=schemas.User, name="user:me")
 async def read_users_me(current_user: schemas.User = Depends(user.get_current_user)):
     return current_user
