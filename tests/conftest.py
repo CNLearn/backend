@@ -1,6 +1,7 @@
 import os
 from typing import Callable, Optional
 
+import alembic
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
@@ -9,8 +10,6 @@ from httpx import AsyncClient, Response
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import alembic
-from alembic.config import Config
 from app import schemas
 from app.crud import user
 from app.models.user import User
@@ -20,7 +19,7 @@ from app.models.user import User
 @pytest.fixture(scope="session")
 def apply_migrations():
     os.environ["TESTING"] = "1"
-    config = Config("alembic.ini")
+    config = alembic.config.Config("alembic.ini")
     alembic.command.upgrade(config, "head")
     yield
     alembic.command.downgrade(config, "base")
