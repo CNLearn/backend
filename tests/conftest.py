@@ -2,6 +2,7 @@ import os
 from typing import Callable, Optional
 
 import alembic
+from alembic.config import Config
 import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
@@ -19,7 +20,7 @@ from app.models.user import User
 @pytest.fixture(scope="session")
 def apply_migrations():
     os.environ["TESTING"] = "1"
-    config = alembic.config.Config("alembic.ini")
+    config = Config("alembic.ini")
     alembic.command.upgrade(config, "head")
     yield
     alembic.command.downgrade(config, "base")
