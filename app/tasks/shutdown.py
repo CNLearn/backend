@@ -1,11 +1,11 @@
-from typing import Callable
+from typing import Awaitable, Callable
 
 from fastapi import FastAPI
 
 from app.db.connections import close_postgres_database_connection
 
 
-def database_stop_app_handler(app: FastAPI) -> Callable:
+def database_stop_app_handler(app: FastAPI) -> Callable[[], Awaitable[None]]:
     async def stop_db() -> None:
         await close_postgres_database_connection(app)
 

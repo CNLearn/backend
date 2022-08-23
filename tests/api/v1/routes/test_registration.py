@@ -6,7 +6,7 @@ from httpx import AsyncClient, Response
 
 
 @pytest.mark.asyncio
-async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table: Callable[..., None]):
+async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table: Callable[..., None]) -> None:
     create_user_url: str = app.url_path_for("user:create-user")
     response: Response = await client.post(
         url=create_user_url,

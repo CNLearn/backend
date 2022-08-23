@@ -1,8 +1,7 @@
-from contextlib import contextmanager
 from contextlib import nullcontext as does_not_raise
 from datetime import timedelta
 from time import sleep
-from typing import Optional
+from typing import Any, ContextManager, Optional
 from unittest import mock
 
 import pytest
@@ -16,7 +15,7 @@ from app.core.security import (
 )
 
 
-def test_verify_password():
+def test_verify_password() -> None:
     hashed = get_password_hash("amazing")
     assert verify_password("amazing", hashed)
 
@@ -41,8 +40,8 @@ def test_encoding_decoding_tokens(
     additional_string: str,
     expires_delta: Optional[timedelta],
     expired: bool,
-    expectation: contextmanager,
-):
+    expectation: ContextManager[Any],
+) -> None:
     settings_mock.ACCESS_TOKEN_EXPIRE_MINUTES = 10
     settings_mock.SECRET_KEY = "wowsosecret"
 

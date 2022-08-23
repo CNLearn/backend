@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any
 
 from fastapi import APIRouter
 
@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_words() -> List[Dict[str, Union[int, str]]]:
+async def get_words() -> Any:
     """
     Returns a list of words.
     """

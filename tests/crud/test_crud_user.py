@@ -4,9 +4,9 @@ from unittest import mock
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import schemas
-from app.crud import user
+from app.crud.crud_user import user as crud_user
 from app.models.user import User
+from app.schemas.user import UserCreate, UserUpdate
 
 
 @mock.patch("app.crud.crud_user.verify_password")
@@ -16,15 +16,15 @@ async def test_crud_user(
     mocked_get_password_hash: mock.MagicMock,
     mocked_verify_password: mock.MagicMock,
     get_async_session: AsyncSession,
-    user_schema: Callable[..., schemas.UserCreate],
-):
+    user_schema: Callable[..., UserCreate],
+) -> None:
     # let's first call user get with nothing in there
-    no_user: Optional[User] = await user.get(get_async_session, id=1)
+    no_user: Optional[User] = await crud_user.get(get_async_session, id=1)
     assert no_user is None
 
     mocked_get_password_hash.return_value = "MockedPassword"
-    user_in: schemas.UserCreate = user_schema(password="amazing", email="user@email.com", full_name="Fake Name")
-    new_user: User = await user.create(get_async_session, obj_in=user_in)
+    user_in: UserCreate = user_schema(password="amazing", email="user@email.com", full_name="Fake Name")
+    new_user: User = await crud_user.create(get_async_session, obj_in=user_in)
     assert new_user.email == "user@email.com"
     assert new_user.full_name == "Fake Name"
     assert new_user.hashed_password == "MockedPassword"
@@ -35,39 +35,39 @@ async def test_crud_user(
     user_id: int = new_user.id
 
     # now let's call user get again and we should have one with the same id
-    existing_user: Optional[User] = await user.get(get_async_session, id=user_id)
+    existing_user: Optional[User] = await crud_user.get(get_async_session, id=user_id)
     assert isinstance(existing_user, User)
 
     # let's call get_multi and see that there are in fact 1 user(s)
-    users: list[User] = await user.get_multi(get_async_session)
+    users: list[User] = await crud_user.get_multi(get_async_session)
     assert len(users) == 1
 
     # you want to change your email? ok let's do that
-    user_schema_in = schemas.UserUpdate(email="newuser@email.com")
-    updated_user: User = await user.update(get_async_session, db_obj=new_user, obj_in=user_schema_in)
+    user_schema_in = UserUpdate(email="newuser@email.com")
+    updated_user: User = await crud_user.update(get_async_session, db_obj=new_user, obj_in=user_schema_in)
     assert updated_user.email == "newuser@email.com"
 
     # you even want to change your password? ok let's generate a new mock return_value
     mocked_get_password_hash.return_value = "MockedPassword2"
-    user_schema_in = schemas.UserUpdate(password="getsoverwrittenbythehash")
-    updated_user: User = await user.update(get_async_session, db_obj=updated_user, obj_in=user_schema_in)
+    user_schema_in = UserUpdate(password="getsoverwrittenbythehash")
+    updated_user = await crud_user.update(get_async_session, db_obj=updated_user, obj_in=user_schema_in)
     assert updated_user.hashed_password == "MockedPassword2"
 
     # do you think we can find you by email? let's see
-    user_by_email: Optional[User] = await user.get_by_email(get_async_session, email="newuser@email.com")
+    user_by_email: Optional[User] = await crud_user.get_by_email(get_async_session, email="newuser@email.com")
     assert isinstance(user_by_email, User)
     assert user_by_email.email == "newuser@email.com"
     assert user_by_email.id == user_id
 
-    user_no_such_email: Optional[User] = await user.get_by_email(get_async_session, email="fake@email.com")
+    user_no_such_email: Optional[User] = await crud_user.get_by_email(get_async_session, email="fake@email.com")
     assert user_no_such_email is None
 
     # let's check whether the user is active and is a superuser. by default, it will be True and False respectively
-    assert user.is_active(updated_user) is True
-    assert user.is_superuser(updated_user) is False
+    assert crud_user.is_active(updated_user) is True
+    assert crud_user.is_superuser(updated_user) is False
 
     # let's log our user in. we will enter an email that does not exist first
-    no_logged_in_user: Optional[User] = await user.authenticate(
+    no_logged_in_user: Optional[User] = await crud_user.authenticate(
         get_async_session,
         email="fake@email.com",
         password="asd",
@@ -76,7 +76,7 @@ async def test_crud_user(
 
     # ok now we forgot our password momentarily
     mocked_verify_password.return_value = False
-    incorrect_password_no_user: Optional[User] = await user.authenticate(
+    incorrect_password_no_user: Optional[User] = await crud_user.authenticate(
         get_async_session,
         email="newuser@email.com",
         password="asd",
@@ -86,7 +86,7 @@ async def test_crud_user(
 
     # ooooh I remember the password now
     mocked_verify_password.return_value = True
-    correct_password_user: Optional[User] = await user.authenticate(
+    correct_password_user: Optional[User] = await crud_user.authenticate(
         get_async_session,
         email="newuser@email.com",
         password="doesntmatter",
@@ -95,7 +95,7 @@ async def test_crud_user(
     assert mocked_verify_password.called
 
     # you want to leave us? :( well, I am sorry to hear that
-    removed_user: Optional[User] = await user.remove(get_async_session, id=user_id)
+    removed_user: Optional[User] = await crud_user.remove(get_async_session, id=user_id)
     assert isinstance(removed_user, User)
     # let's check that there's no one left
-    assert len(await user.get_multi(get_async_session)) == 0
+    assert len(await crud_user.get_multi(get_async_session)) == 0

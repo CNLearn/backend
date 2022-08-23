@@ -7,7 +7,7 @@ from app.tasks.shutdown import database_stop_app_handler
 from app.tasks.startup import database_start_app_handler
 
 
-def create_application():
+def create_application() -> FastAPI:
     """
     Creates and returns a FastAPI instance.
     """
@@ -29,4 +29,4 @@ def create_application():
     return app
 
 
-app = create_application()
+app: FastAPI = create_application()

@@ -1,4 +1,4 @@
-from typing import Any, Callable
+from typing import Any, Awaitable, Callable
 
 import pytest
 from fastapi import FastAPI
@@ -8,7 +8,7 @@ from app.models.user import User
 
 
 @pytest.mark.asyncio
-async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table: Callable[[None], None]):
+async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table: Callable[[None], None]) -> None:
     create_user_url: str = app.url_path_for("user:create-user")
     response: Response = await client.post(
         url=create_user_url,
@@ -30,9 +30,9 @@ async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table:
 async def test_login_access_token(
     client: AsyncClient,
     app: FastAPI,
-    create_user_object: Callable[..., User],
+    create_user_object: Callable[..., Awaitable[User]],
     clean_users_table: Callable[[None], None],
-):
+) -> None:
     email: str = "admin@cnlearn.app"
     password: str = "thisissecret"
     await create_user_object(email=email, password=password)
@@ -58,7 +58,7 @@ async def test_login_access_token(
 async def test_login_access_token_fail(
     client: AsyncClient,
     app: FastAPI,
-):
+) -> None:
     # let's hit the login endpoint
     login_url: str = app.url_path_for("user:access-token")
     response: Response = await client.post(
@@ -79,9 +79,9 @@ async def test_login_access_token_fail(
 async def test_read_users_me(
     client: AsyncClient,
     app: FastAPI,
-    return_logged_in_user_bearer_token: Callable[..., str],
+    return_logged_in_user_bearer_token: Callable[..., Awaitable[str]],
     clean_users_table: Callable[[None], None],
-):
+) -> None:
     email: str = "free@cnlearn.app"
     password: str = "paid"
     token: str = await return_logged_in_user_bearer_token(email=email, password=password)
@@ -104,7 +104,7 @@ async def test_read_users_me(
 async def test_read_users_me_fail(
     client: AsyncClient,
     app: FastAPI,
-):
+) -> None:
     me_url: str = app.url_path_for("user:me")
     response: Response = await client.get(
         url=me_url,
