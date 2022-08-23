@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 async def open_postgres_database_connection(app: FastAPI) -> None:
     # these are configured in the settings module
 
+    if settings.SQLALCHEMY_POSTGRES_URI is None:
+        return
     ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI.replace("postgresql", "postgresql+asyncpg", 1)
-    if settings.TESTING:
-        ASYNC_URI += "_testing"
     engine = create_async_engine(ASYNC_URI, echo=False)
     async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     try:

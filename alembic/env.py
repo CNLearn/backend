@@ -66,8 +66,6 @@ def run_migrations_online():
     """
     configuration = config.get_section(config.config_ini_section)
     database_url: str = get_url()
-    if settings.TESTING:
-        database_url += "_testing"
     configuration["sqlalchemy.url"] = database_url
     connectable = config.attributes.get("connection", None)
     if connectable is None:

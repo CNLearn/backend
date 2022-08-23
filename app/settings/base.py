@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     POSTGRES_SERVER: str
     POSTGRES_DB: str
     POSTGRES_PORT: int
-    TESTING: int = 0  # if this is 1, we will connect to the testing database
+    TESTING: int  # if this is 1, we will connect to the testing database
     SQLALCHEMY_POSTGRES_URI: Optional[PostgresDsn] = None
     # if the last one is None, let's build it ourselves
 
@@ -32,6 +32,9 @@ class Settings(BaseSettings):
             return v
 
         postgres_db_name: str = values.get("POSTGRES_DB", "")
+        if values.get("TESTING", 0):
+            postgres_db_name += "_testing"
+
         return PostgresDsn.build(
             scheme="postgresql",
             user=values.get("POSTGRES_USER"),

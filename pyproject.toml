@@ -27,3 +27,10 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
+
+[tool.mypy]
+python_version = "3.10"
+files = "app/**/*.py, tests/**/*.py"
+plugins = "sqlalchemy.ext.mypy.plugin"
+exclude = ['.venv/']
+strict = true
