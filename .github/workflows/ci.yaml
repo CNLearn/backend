@@ -58,3 +58,8 @@ jobs:
           TESTING: 1
         run: |
           pytest
+      - name: Coveralls GitHub Action
+        uses: coverallsapp/github-action@master
+        with:
+          path-to-lcov: "./cov.info"
+          github-token: ${{ secrets.GITHUB_TOKEN }}

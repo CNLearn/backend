@@ -1,3 +1,6 @@
+[![Run flake8, black and pytest](https://github.com/CNLearn/backend/actions/workflows/ci.yaml/badge.svg)](https://github.com/CNLearn/backend/actions/workflows/ci.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/CNLearn/backend/badge.svg?branch=adding_coverage)](https://coveralls.io/github/CNLearn/backend?branch=adding_coverage)
+
 # FastAPI Backend for Web CNLearn
 
 Hi!
