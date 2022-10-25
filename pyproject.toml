@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
 minversion = "7.0"
 asyncio_mode = "auto"
+addopts = "--cov=app --cov-report=html"
 
 [tool.black]
 line-length = 120
