@@ -1,8 +1,8 @@
 import logging
 
 from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import close_all_sessions, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import close_all_sessions
 
 from app.settings.base import settings
 
@@ -14,9 +14,9 @@ async def open_postgres_database_connection(app: FastAPI) -> None:
 
     if settings.SQLALCHEMY_POSTGRES_URI is None:
         return
-    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI.replace("postgresql", "postgresql+asyncpg", 1)
+    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI
     engine = create_async_engine(ASYNC_URI, echo=False)
-    async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+    async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     try:
         app.state._db = async_session
         logging.info("You have connected to the database")

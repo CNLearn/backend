@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Sequence
 from unittest import mock
 
 import pytest
@@ -39,7 +39,7 @@ async def test_crud_user(
     assert isinstance(existing_user, User)
 
     # let's call get_multi and see that there are in fact 1 user(s)
-    users: list[User] = await crud_user.get_multi(get_async_session)
+    users: Sequence[User] = await crud_user.get_multi(get_async_session)
     assert len(users) == 1
 
     # you want to change your email? ok let's do that

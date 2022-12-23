@@ -1,15 +1,23 @@
-from sqlalchemy import Column, Integer
+from sqlalchemy import Integer, MetaData
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+custom_metadata = MetaData(
+    naming_convention={
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_`%(constraint_name)s`",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
+    }
+)
 
 
-class BaseWithID:
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
+class Base(DeclarativeBase):
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower() + "s"
 
-    id: int = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-
-# declarative base class
-Base = declarative_base(cls=BaseWithID)
+    metadata = custom_metadata
