@@ -5,7 +5,6 @@ from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
 
 
 class Settings(BaseSettings):
-
     # Application settings
     SECRET_KEY: str = secrets.token_urlsafe(32)
     API_V1_STR: str = "/api/v1"
@@ -36,7 +35,7 @@ class Settings(BaseSettings):
             postgres_db_name += "_testing"
 
         return PostgresDsn.build(
-            scheme="postgresql",
+            scheme="postgresql+asyncpg",
             user=values.get("POSTGRES_USER"),
             password=values.get("POSTGRES_PASSWORD"),
             host=values.get("POSTGRES_SERVER"),

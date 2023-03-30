@@ -1,9 +1,17 @@
+import asyncio
 from logging.config import fileConfig
 
-from psycopg2 import DatabaseError
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from app.db.base import Base
+from app.models.user import User  # noqa: F401
+from app.models.vocabulary import (  # noqa: F401
+    Character,
+    Word,
+    word_character_association_table,
+)
 from app.settings.base import settings
 
 # this is the Alembic Config object, which provides
@@ -18,7 +26,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -28,6 +36,24 @@ target_metadata = None
 
 def get_url():
     return settings.SQLALCHEMY_POSTGRES_URI
+
+
+def do_run_migrations(connection):
+    def process_revision_directives(context, revision, directives):
+        if config.cmd_opts.autogenerate:
+            script = directives[0]
+            if script.upgrade_ops.is_empty():
+                directives[:] = []
+
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        compare_type=True,
+        process_revision_directives=process_revision_directives,
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
 
 
 def run_migrations_offline():
@@ -43,8 +69,9 @@ def run_migrations_offline():
 
     """
     url = get_url()
+
     if settings.TESTING:
-        raise DatabaseError("Running testing migrations offline currently not permitted.")
+        raise Exception("Running testing migrations offline currently not permitted.")
 
     context.configure(
         url=url,
@@ -57,7 +84,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+async def run_migrations_online():
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -68,19 +95,22 @@ def run_migrations_online():
     database_url: str = get_url()
     configuration["sqlalchemy.url"] = database_url
     connectable = config.attributes.get("connection", None)
+
     if connectable is None:
-        connectable = engine_from_config(
-            configuration, prefix="sqlalchemy.", poolclass=pool.NullPool, isolation_level="AUTOCOMMIT"
+        connectable = async_engine_from_config(
+            configuration,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+            isolation_level="AUTOCOMMIT",
         )
 
-    with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
 
-        with context.begin_transaction():
-            context.run_migrations()
+    await connectable.dispose()
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    asyncio.run(run_migrations_online())
