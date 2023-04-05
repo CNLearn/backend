@@ -1,32 +1,17 @@
-from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+import uvicorn
 
-from app.api.v1.api import api_router
-from app.settings.base import settings
-from app.tasks.shutdown import database_stop_app_handler
-from app.tasks.startup import database_start_app_handler
+from app.app import app
 
 
-def create_application() -> FastAPI:
+def development() -> None:
     """
-    Creates and returns a FastAPI instance.
+    This runs the development server.
     """
-    app = FastAPI(
-        title=settings.APP_NAME,
-        version=settings.VERSION,
-    )
-    app.add_event_handler("startup", database_start_app_handler(app))
-    app.add_event_handler("shutdown", database_stop_app_handler(app))
-    # change CORS settings
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.include_router(api_router, prefix=settings.API_V1_STR)
-    return app
+    uvicorn.run("app.app:app", host="127.0.0.1", port=8000, log_level="debug", reload=True)
 
 
-app: FastAPI = create_application()
+def production() -> None:
+    """
+    This runs the production server but it will probably be run differently.
+    """
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")

@@ -27,7 +27,7 @@ def apply_migrations() -> Generator[None, None, None]:
 # Create a new application for testing
 @pytest.fixture(scope="session")
 def app(apply_migrations: Generator[None, None, None]) -> FastAPI:
-    from app.server import create_application
+    from app.app import create_application
 
     return create_application()
 
