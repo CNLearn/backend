@@ -6,13 +6,14 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
 from sqlalchemy import delete
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 import alembic
 from alembic.config import Config
 from app.crud.crud_user import user as crud_user
 from app.models.user import User
 from app.schemas.user import UserCreate
+from app.settings.base import settings
 
 
 # Apply migrations at beginning and end of testing session
@@ -34,16 +35,22 @@ def app(apply_migrations: Generator[None, None, None]) -> FastAPI:
 
 @pytest_asyncio.fixture
 async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
-    async with LifespanManager(app):
+    async with LifespanManager(app) as manager:
         async with AsyncClient(
-            app=app, base_url="http://testserver", headers={"Content-Type": "application/json"}
+            app=manager.app,
+            base_url="http://testserver",
+            headers={"Content-Type": "application/json"},
         ) as client:
             yield client
 
 
 @pytest_asyncio.fixture
-async def get_async_session(client: AsyncClient, app: FastAPI) -> AsyncGenerator[AsyncSession, None]:
-    async_session_maker = app.state._db
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    if settings.SQLALCHEMY_POSTGRES_URI is None:
+        return
+    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI
+    engine = create_async_engine(ASYNC_URI, echo=False)
+    async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with async_session_maker() as async_session:
         yield async_session
 
