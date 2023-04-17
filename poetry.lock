@@ -1743,14 +1743,14 @@ files = [
 
 [[package]]
 name = "types-python-jose"
-version = "3.3.4.6"
+version = "3.3.4.7"
 description = "Typing stubs for python-jose"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-python-jose-3.3.4.6.tar.gz", hash = "sha256:a26ab714efdf95c0735ce2eab265e3a640533110e996e9958c139db17c731707"},
-    {file = "types_python_jose-3.3.4.6-py3-none-any.whl", hash = "sha256:99aeebbb6b8623fb5a87e75af8919a910786d05dc59d1e8c534fb9ce6f5cdba5"},
+    {file = "types-python-jose-3.3.4.7.tar.gz", hash = "sha256:33c033d313a02457b09874a7e516c75da2538069ffe30f779968482bd6f3b123"},
+    {file = "types_python_jose-3.3.4.7-py3-none-any.whl", hash = "sha256:896ba4b99c2da8f3546ef02db32e39d69f4ea75c0e9ed8ae3664bc40bc72c7d8"},
 ]
 
 [package.dependencies]
@@ -1823,4 +1823,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0d909cd48c8cd1844def462157c7028858c683df3cb9083803ed216d34620495"
+content-hash = "a67974b15b905e3e523c553ccd58ddf295750fd26ed5c60cb1bc1750d78d01f1"
