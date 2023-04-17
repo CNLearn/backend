@@ -3,8 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.v1.api import api_router
 from app.settings.base import settings
-from app.tasks.shutdown import database_stop_app_handler
-from app.tasks.startup import database_start_app_handler
+from app.state import lifespan
 
 
 def create_application() -> FastAPI:
@@ -14,9 +13,8 @@ def create_application() -> FastAPI:
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.VERSION,
+        lifespan=lifespan,
     )
-    app.add_event_handler("startup", database_start_app_handler(app))
-    app.add_event_handler("shutdown", database_stop_app_handler(app))
     # change CORS settings
     app.add_middleware(
         CORSMiddleware,
