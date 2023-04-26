@@ -1,6 +1,17 @@
-name: Run flake8, black and pytest
-
-on: [push, pull_request]
+name: CI Pipeline
+on: push
+env:
+  test_pg_user: postgres
+  test_pg_password: postgres
+  test_pg_db: cnlearn_testing
+  pg_db: cnlearn
+  app_name: "CNLearn Testing"
+  app_version: "0.0.5"
+  server_name: TestingServer
+  server: localhost
+  server_host: http://127.0.0.1:8000
+  pg_port: 5432
+  testing: 1
 
 jobs:
   build:
@@ -8,6 +19,20 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ env.test_pg_user }}
+          POSTGRES_PASSWORD: ${{ env.test_pg_user }}
+          POSTGRES_DB: ${{ env.test_pg_db }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v3
@@ -43,37 +68,18 @@ jobs:
       - name: Run mypy
         run: poetry run mypy .
 
-      - name: Setup PostgreSQL
-        uses: Harmon758/postgresql-action@v1.0.0
-        with:
-          postgresql version: "15"
-          postgresql db: "cnlearn_testing"
-          postgresql user: "postgres"
-          postgresql password: "postgres" # add this to secret
-
-      - name: Wait / Sleep
-        uses: jakejarvis/wait-action@v0.1.0
-        with:
-          time: "10s"
-
-      - name: Collect Docker Logs
-        uses: jwalton/gh-docker-logs@v1.0.0
-
-      - name: Check running containers
-        run: docker ps -a
-
       - name: Test with pytest
         env:
-          APP_NAME: "CNLearn Testing"
-          VERSION: 0.0.5
-          SERVER_NAME: localhost
-          SERVER_HOST: http://127.0.0.1:8000
-          POSTGRES_SERVER: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: cnlearn
-          TESTING: 1
+          APP_NAME: ${{ env.app_name }}
+          VERSION: ${{ env.app_version }}
+          SERVER_NAME: ${{ env.server_name }}
+          SERVER_HOST: ${{ env.server_host }}
+          POSTGRES_SERVER: ${{ env.server }}
+          POSTGRES_PORT: ${{ env.pg_port }}
+          POSTGRES_USER: ${{ env.test_pg_user }}
+          POSTGRES_PASSWORD: ${{ env.test_pg_password }}
+          POSTGRES_DB: ${{ env.pg_db }}
+          TESTING: ${{ env.testing }}
         run: |
           poetry run pytest
 
