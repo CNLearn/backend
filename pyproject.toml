@@ -35,7 +35,7 @@ types-passlib = "^1.7.7.11"
 types-python-jose = "^3.3.4.7"
 isort = "^5.12.0"
 ruff = "^0.0.263"
-ipython = "^8.11.0"
+ipython = "^8.13.2"
 
 [tool.poetry.group.test.dependencies]
 asgi_lifespan = "^2.1.0"
