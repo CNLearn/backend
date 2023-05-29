@@ -19,7 +19,7 @@ email-validator = "^2.0.0"
 fastapi = "^0.95.1"
 httpx = "^0.24.0"
 passlib = "^1.7.4"
-pydantic = {version = "^1.10.7", extras = ["dotenv"]}
+pydantic = {version = "^1.10.8", extras = ["dotenv"]}
 python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 python-multipart = "^0.0.6"
 sqlalchemy = {version = "^2.0.10", extras = ["asyncio", "mypy"]}
