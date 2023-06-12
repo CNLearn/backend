@@ -16,7 +16,7 @@ alembic = "^1.10.2"
 asyncpg = "^0.27.0"
 bcrypt = "^4.0.1"
 email-validator = "^2.0.0"
-fastapi = "^0.96.0"
+fastapi = "^0.97.0"
 httpx = "^0.24.0"
 passlib = "^1.7.4"
 pydantic = {version = "^1.10.7", extras = ["dotenv"]}
