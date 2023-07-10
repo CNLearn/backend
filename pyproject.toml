@@ -22,7 +22,7 @@ passlib = "^1.7.4"
 pydantic = {version = "^1.10.7", extras = ["dotenv"]}
 python-jose = {version = "^3.3.0", extras = ["cryptography"]}
 python-multipart = "^0.0.6"
-sqlalchemy = {version = "^2.0.10", extras = ["asyncio", "mypy"]}
+sqlalchemy = {version = "^2.0.18", extras = ["asyncio", "mypy"]}
 uvicorn = "^0.22.0"
 
 [tool.poetry.group.dev.dependencies]
