@@ -34,8 +34,8 @@ target_metadata = Base.metadata
 # ... etc.
 
 
-def get_url():
-    return settings.SQLALCHEMY_POSTGRES_URI
+def get_url() -> str:
+    return str(settings.SQLALCHEMY_POSTGRES_URI)
 
 
 def do_run_migrations(connection):

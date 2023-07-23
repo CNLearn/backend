@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.v1.api import api_router
+from app.middleware.logger import AccessLogger
 from app.settings.base import settings
+from app.settings.logging.structlog import configure_logging
 from app.state import lifespan
 
 
@@ -15,6 +17,7 @@ def create_application() -> FastAPI:
         version=settings.VERSION,
         lifespan=lifespan,
     )
+    logger = configure_logging()
     # change CORS settings
     app.add_middleware(
         CORSMiddleware,
@@ -23,6 +26,7 @@ def create_application() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(AccessLogger, logger=logger)
     app.include_router(api_router, prefix=settings.API_V1_STR)
     return app
 

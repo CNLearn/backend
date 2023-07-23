@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 # Shared properties
@@ -23,10 +23,8 @@ class UserUpdate(UserBase):
 
 
 class UserInDBBase(UserBase):
+    model_config = ConfigDict(from_attributes=True)
     id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
 
 
 # Additional properties to return via API

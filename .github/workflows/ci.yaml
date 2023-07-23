@@ -4,14 +4,13 @@ env:
   test_pg_user: postgres
   test_pg_password: postgres
   test_pg_db: cnlearn_testing
-  pg_db: cnlearn
   app_name: "CNLearn Testing"
   app_version: "0.0.5"
   server_name: TestingServer
   server: localhost
   server_host: http://127.0.0.1:8000
   pg_port: 5432
-  testing: 1
+  environment: "Testing"
 
 jobs:
   build:
@@ -78,10 +77,10 @@ jobs:
           POSTGRES_PORT: ${{ env.pg_port }}
           POSTGRES_USER: ${{ env.test_pg_user }}
           POSTGRES_PASSWORD: ${{ env.test_pg_password }}
-          POSTGRES_DB: ${{ env.pg_db }}
-          TESTING: ${{ env.testing }}
+          POSTGRES_DB: ${{ env.test_pg_db }}
+          ENVIRONMENT: ${{ env.environment }}
         run: |
-          poetry run pytest
+          poetry run pytest -s
 
       - name: Coveralls GitHub Action
         uses: coverallsapp/github-action@master
