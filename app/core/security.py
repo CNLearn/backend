@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional, TypedDict, Union, cast
 
@@ -8,8 +7,6 @@ from passlib.context import CryptContext
 from app.settings.base import settings
 
 ALGORITHM = "HS256"
-
-logger = logging.getLogger(__name__)
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -1,7 +1,11 @@
+import os
 import secrets
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Literal
 
-from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn, validator
+from pydantic import AnyHttpUrl, PostgresDsn, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+Environment = Literal["Development", "Staging", "Production", "Testing"]
 
 
 class Settings(BaseSettings):
@@ -11,67 +15,69 @@ class Settings(BaseSettings):
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    ENVIRONMENT: Environment
 
     APP_NAME: str
     VERSION: str
 
     # PostgreSQL database settings
+    POSTGRES_SCHEMA: str = "postgresql+asyncpg"
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_SERVER: str
     POSTGRES_DB: str
     POSTGRES_PORT: int
-    TESTING: int  # if this is 1, we will connect to the testing database
-    SQLALCHEMY_POSTGRES_URI: Optional[PostgresDsn] = None
-    # if the last one is None, let's build it ourselves
-
-    @validator("SQLALCHEMY_POSTGRES_URI", pre=True)
-    def create_postgres_uri(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
-        if isinstance(v, str):
-            return v
-
-        postgres_db_name: str = values.get("POSTGRES_DB", "")
-        if values.get("TESTING", 0):
-            postgres_db_name += "_testing"
-
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{postgres_db_name}",
-            port=f"{values.get('POSTGRES_PORT')}",
-        )
+    SQLALCHEMY_POSTGRES_URI: PostgresDsn
 
     # password settings
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
-    class Config:
-        case_sensitive = True
+    @model_validator(mode="before")
+    def something_data(cls, data: dict[str, Any]) -> dict[str, Any]:
+        scheme: str = "postgresql+asyncpg"
+        postgres_db_name: str = str(data["POSTGRES_DB"])
+        user: str = str(data["POSTGRES_USER"])
+        password: str = str(data["POSTGRES_PASSWORD"])
+        host: str = str(data["POSTGRES_SERVER"])
+        port: int = int(data["POSTGRES_PORT"])
+        url = f"{scheme}://{user}:{password}@{host}:{port}/{postgres_db_name}"
+        data["SQLALCHEMY_POSTGRES_URI"] = PostgresDsn(url)
+        return data
 
 
 class DevSettings(Settings):
-    class Config:
-        env_file = ".dev.env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(env_file=".dev.env", env_file_encoding="utf-8")
 
 
 class TestSettings(Settings):
-    class Config:
-        env_file = ".test.env"
-        env_file_encoding = "utf-8"
+    model_config = SettingsConfigDict(env_file=".testing.env", env_file_encoding="utf-8")
 
 
-class StageSettings(Settings):
-    class Config:
-        env_file = ".stage.env"
-        env_file_encoding = "utf-8"
+class StagingSettings(Settings):
+    # TODO: think about having these in some secrets/depending on deployment
+    model_config = SettingsConfigDict(env_file=".staging.env", env_file_encoding="utf-8")
 
 
 class ProdSettings(Settings):
-    class Config:
-        env_file = ".prod.env"
-        env_file_encoding = "utf-8"
+    # TODO: think about having these in some secrets/depending on deployment
+    model_config = SettingsConfigDict(env_file=".production.env", env_file_encoding="utf-8")
 
 
-settings = DevSettings()
+def get_settings() -> DevSettings | TestSettings | StagingSettings | ProdSettings:
+    environment: str = os.getenv("ENVIRONMENT", "")
+    settings: DevSettings | TestSettings | StagingSettings | ProdSettings
+    match environment:
+        case "Production":
+            settings = ProdSettings.model_validate({"ENVIRONMENT": "Production"})
+        case "Staging":
+            settings = StagingSettings.model_validate({"ENVIRONMENT": "Staging"})
+        case "Development":
+            settings = DevSettings.model_validate({"ENVIRONMENT": "Development"})
+        case "Testing":
+            settings = TestSettings.model_validate({"ENVIRONMENT": "Testing"})
+        case _:
+            raise ValueError("Unknown environment passed")
+    return settings
+
+
+settings = get_settings()

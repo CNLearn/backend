@@ -1,4 +1,3 @@
-import logging
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -10,8 +9,6 @@ from app.crud.crud_user import user as crud_user
 from app.schemas.user import User, UserCreate
 
 router: APIRouter = APIRouter()
-
-logger = logging.getLogger(__name__)
 
 
 @router.post("/register", response_model=User, name="user:create-user")

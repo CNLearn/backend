@@ -12,36 +12,39 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-alembic = "^1.10.2"
-asyncpg = "^0.27.0"
+alembic = "^1.11.1"
+asyncpg = "^0.28.0"
 bcrypt = "^4.0.1"
-email-validator = "^2.0.0"
-fastapi = "^0.99.0"
-httpx = "^0.24.0"
-passlib = "^1.7.4"
-pydantic = {version = "^1.10.7", extras = ["dotenv"]}
-python-jose = {version = "^3.3.0", extras = ["cryptography"]}
+email-validator = "^2.0.0.post2"
+fastapi = "^0.100.0"
+httpx = "^0.24.1"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydantic = "^2.0.3"
+python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
-sqlalchemy = {version = "^2.0.10", extras = ["asyncio", "mypy"]}
-uvicorn = "^0.22.0"
+sqlalchemy = "^2.0.19"
+uvicorn = "^0.23.1"
+structlog = "^23.1.0"
+orjson = "^3.9.2"
+pydantic-settings = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-flake8 = "^6.0.0"
+black = "^23.7.0"
 pre-commit = "^3.2.1"
-mypy = "^1.2.0"
+mypy = "^1.4.1"
 mypy-extensions = "^1.0.0"
 types-passlib = "^1.7.7.12"
-types-python-jose = "^3.3.4.7"
+types-python-jose = "^3.3.4.8"
 isort = "^5.12.0"
-ruff = "^0.0.275"
-ipython = "^8.11.0"
+ruff = "^0.0.280"
+ipython = "^8.14.0"
+rich = "^13.4.2"
 
 [tool.poetry.group.test.dependencies]
 asgi_lifespan = "^2.1.0"
-pytest = "^7.3.1"
-pytest_asyncio = "^0.21.0"
-pytest-cov = "^4.0.0"
+pytest = "^7.4.0"
+pytest_asyncio = "^0.21.1"
+pytest-cov = "^4.1.0"
 
 [tool.poetry.scripts]
 dev = "app.server:development"
@@ -59,6 +62,7 @@ addopts = "--cov=app --cov-report=lcov:cov.info"
 [tool.coverage.run]
 omit = [
     "app/server.py",
+    "app/settings/logging/*",
 ]
 
 

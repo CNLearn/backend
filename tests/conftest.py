@@ -48,7 +48,7 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     if settings.SQLALCHEMY_POSTGRES_URI is None:
         return
-    ASYNC_URI: str = settings.SQLALCHEMY_POSTGRES_URI
+    ASYNC_URI: str = str(settings.SQLALCHEMY_POSTGRES_URI)
     engine = create_async_engine(ASYNC_URI, echo=False)
     async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with async_session_maker() as async_session:

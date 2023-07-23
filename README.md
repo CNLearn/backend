@@ -10,5 +10,5 @@ This will be the backend for Web CNLearn written in Python using FastAPI, SQLAlc
 **If you run the pytest test suite locally, make sure you run it as:**
 
 ```
-TESTING=1 pytest
+ENVIRONMENT=Testing poetry run pytest
 ```
