@@ -1,3 +1,4 @@
+import os
 from typing import AsyncGenerator, Awaitable, Callable, Generator, Optional
 
 import pytest
@@ -16,9 +17,17 @@ from app.schemas.user import UserCreate
 from app.settings.base import settings
 
 
+# if the wrong environment, stop tests
+@pytest.fixture(scope="session", autouse=True)
+def check_environment() -> Generator[None, None, None]:
+    if os.getenv("ENVIRONMENT") != "Testing":
+        raise Exception("Tests can only be run in a testing environment")
+    yield
+
+
 # Apply migrations at beginning and end of testing session
 @pytest.fixture(scope="session")
-def apply_migrations() -> Generator[None, None, None]:
+def apply_migrations(check_environment: Callable[[None], None]) -> Generator[None, None, None]:
     config = Config("alembic.ini")
     alembic.command.upgrade(config, "head")
     yield
