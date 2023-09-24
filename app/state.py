@@ -14,8 +14,6 @@ class AppState(TypedDict):
 
 @contextlib.asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[AppState, None]:
-    if settings.SQLALCHEMY_POSTGRES_URI is None:
-        return
     ASYNC_URI: str = str(settings.SQLALCHEMY_POSTGRES_URI)
     engine = create_async_engine(ASYNC_URI, echo=False)
     async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)

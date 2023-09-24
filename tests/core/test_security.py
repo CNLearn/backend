@@ -24,11 +24,18 @@ def test_verify_password() -> None:
     ("subject", "additional_string", "expires_delta", "expired", "expectation"),
     [
         # I really hope this test does not fail...hopefully faster than 999 days
-        ("vlad", "", timedelta(days=999), False, does_not_raise()),
-        ("vlad", "", None, False, does_not_raise()),
+        pytest.param("vlad", "", timedelta(days=999), False, does_not_raise(), id="999 days expiry time"),
+        pytest.param("vlad", "", None, False, does_not_raise(), id="no expiry time"),
         # TODO: obviously this needs to change...next post
-        ("vlad", "", timedelta(microseconds=1), True, pytest.raises(ExpiredSignatureError)),
-        ("vlad", "_i_4m_a_h4ck3r", None, False, pytest.raises(JWTError)),
+        pytest.param(
+            "vlad",
+            "",
+            timedelta(microseconds=1),
+            True,
+            pytest.raises(ExpiredSignatureError),
+            id="1 microsecond time passed",
+        ),
+        pytest.param("vlad", "_i_4m_a_h4ck3r", None, False, pytest.raises(JWTError), id="invalid jwt"),
     ],
 )
 @mock.patch("app.core.security.settings")

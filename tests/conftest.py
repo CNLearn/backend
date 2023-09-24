@@ -2,19 +2,19 @@ import os
 from typing import AsyncGenerator, Awaitable, Callable, Generator, Optional
 
 import pytest
-import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-import alembic
+import alembic.command
 from alembic.config import Config
 from app.crud.crud_user import user as crud_user
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.settings.base import settings
+from tests.fixtures.vocabulary import add_some_words_and_characters
 
 
 # if the wrong environment, stop tests
@@ -34,15 +34,22 @@ def apply_migrations(check_environment: Callable[[None], None]) -> Generator[Non
     alembic.command.downgrade(config, "base")
 
 
+@pytest.fixture(scope="session")
+def insert_sample_data(apply_migrations: Generator[None, None, None]) -> Generator[None, None, None]:
+    add_some_words_and_characters()
+    yield
+
+
 # Create a new application for testing
 @pytest.fixture(scope="session")
-def app(apply_migrations: Generator[None, None, None]) -> FastAPI:
+def app(insert_sample_data: Generator[None, None, None]) -> FastAPI:
     from app.app import create_application
 
     return create_application()
 
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
+@pytest.fixture
 async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     async with LifespanManager(app) as manager:
         async with AsyncClient(
@@ -53,10 +60,9 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
             yield client
 
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
+@pytest.fixture
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    if settings.SQLALCHEMY_POSTGRES_URI is None:
-        return
     ASYNC_URI: str = str(settings.SQLALCHEMY_POSTGRES_URI)
     engine = create_async_engine(ASYNC_URI, echo=False)
     async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
@@ -64,7 +70,8 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield async_session
 
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
+@pytest.fixture
 async def clean_users_table(get_async_session: AsyncSession) -> AsyncGenerator[None, None]:
     yield
     db: AsyncSession = get_async_session
@@ -72,7 +79,8 @@ async def clean_users_table(get_async_session: AsyncSession) -> AsyncGenerator[N
     await db.commit()
 
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
+@pytest.fixture
 async def create_user_object(get_async_session: AsyncSession) -> Callable[..., Awaitable[User]]:
     async def _create_user(email: str, password: str, full_name: Optional[str] = None) -> User:
         db: AsyncSession = get_async_session
@@ -83,7 +91,8 @@ async def create_user_object(get_async_session: AsyncSession) -> Callable[..., A
     return _create_user
 
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
+@pytest.fixture
 async def return_logged_in_user_bearer_token(
     get_async_session: AsyncSession,
     create_user_object: Callable[..., Awaitable[User]],

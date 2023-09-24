@@ -8,12 +8,13 @@ from app.db.base import Base
 word_character_association_table = Table(
     "word_characters",
     Base.metadata,
-    Column("word_id", ForeignKey("words.id"), primary_key=True),
-    Column("character_id", ForeignKey("characters.id"), primary_key=True),
+    Column[int]("word_id", ForeignKey("words.id"), primary_key=True),
+    Column[int]("character_id", ForeignKey("characters.id"), primary_key=True),
 )
 
 
 class Character(Base):
+    # TODO: this one sohuld probably have a unique thing on it
     character: Mapped[str] = mapped_column(String(1))
     definition: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     pinyin: Mapped[str] = mapped_column(String(50))
