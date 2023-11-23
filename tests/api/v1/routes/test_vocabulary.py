@@ -11,8 +11,8 @@ async def test_search_word(
     client: AsyncClient,
     app: FastAPI,
 ) -> None:
-    search_url: str = app.url_path_for("vocabulary:get-word")
-    query_params: dict[str, str] = {"simplified_word": "鸦雀无声"}
+    search_url: str = app.url_path_for("vocabulary:get-words")
+    query_params: dict[str, str] = {"simplified_words": "鸦雀无声"}
     search_url += "?" + urlencode(query_params)
     response: Response = await client.get(
         url=search_url,
@@ -41,16 +41,14 @@ async def test_search_character(
     app: FastAPI,
 ) -> None:
     # http://localhost:8000/api/v1/vocabulary/get-character?character=%E9%B8%A6&words=true'
-    search_url: str = app.url_path_for("vocabulary:get-character")
-    query_params: dict[str, str | bool] = {"character": "鸦", "words": include_words}
+    search_url: str = app.url_path_for("vocabulary:get-characters")
+    query_params: dict[str, str | bool] = {"characters": "鸦", "include_words": include_words}
     search_url += "?" + urlencode(query_params)
     response: Response = await client.get(
         url=search_url,
     )
-    json_response: dict[str, Any] = response.json()
-
-    print(json_response)
+    json_response: list[dict[str, Any]] = response.json()
 
     assert response.status_code == 200
-    assert json_response["character"] == "鸦"
-    assert len(json_response["words"]) == n_words
+    assert json_response[0]["character"] == "鸦"
+    assert len(json_response[0]["words"]) == n_words

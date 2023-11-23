@@ -10,9 +10,13 @@ from app.models.vocabulary import Word as WordModel
 
 
 class CRUDWord(CRUDBase[WordModel, WordSchema, WordSchema]):
-    async def get_by_simplified(self, db: AsyncSession, *, simplified: SimplifiedWord) -> Sequence[WordModel] | None:
+    async def get_multiple_simplified(
+        self, db: AsyncSession, *, simplified_words: list[SimplifiedWord]
+    ) -> Sequence[WordModel]:
         statement = (
-            select(WordModel).where(WordModel.simplified == simplified).options(selectinload(WordModel.characters))
+            select(WordModel)
+            .where(WordModel.simplified.in_(simplified_words))
+            .options(selectinload(WordModel.characters))
         )
         result = await db.execute(statement)
         return result.scalars().all()
