@@ -12,26 +12,25 @@ from app.domain.vocabulary.common import Character
 from app.domain.vocabulary.word import SimplifiedWord
 
 
-async def search_simplified_word(
-    simplified_word: Annotated[SimplifiedWord, Query(min_length=1, max_length=50)],
+async def search_simplified_words(
+    simplified_words: Annotated[list[SimplifiedWord], Query(min_length=1, max_length=10)],
     db: AsyncSession = Depends(database.get_async_session),
 ) -> list[WordOut] | None:
-    words = await crud_word.get_by_simplified(db, simplified=simplified_word)
-    if words is None:
-        return None
-    else:
-        return RootModel[list[WordOut]].model_validate(words).root
+    words = await crud_word.get_multiple_simplified(db, simplified_words=simplified_words)
+    return RootModel[list[WordOut]].model_validate(words).root
 
 
-async def search_character(
-    character: Annotated[Character, Query(min_length=1, max_length=1)],
-    words: bool = False,
+async def search_characters(
+    characters: Annotated[list[Annotated[Character, Query(min_length=1, max_length=1)]], Query(min_length=1)],
+    include_words: bool = False,
     db: AsyncSession = Depends(database.get_async_session),
-) -> CharacterOut | None:
-    character_object = await crud_character.get_by_character(db, character=character, include_words=words)
-    if character_object is None:
-        return None
-    else:
-        if not words:
-            return CharacterOut.model_validate({**character_object.__dict__, "words": set()})
-        return CharacterOut.model_validate(character_object)
+) -> list[CharacterOut]:
+    character_objects = await crud_character.get_multiple_characters(
+        db, characters=characters, include_words=include_words
+    )
+    if not include_words:
+        return [
+            CharacterOut.model_validate({**character_object.__dict__, "words": set()})
+            for character_object in character_objects
+        ]
+    return RootModel[list[CharacterOut]].model_validate(character_objects).root

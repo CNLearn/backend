@@ -9,19 +9,17 @@ from app.domain.vocabulary.combined import CharacterOut, WordOut
 router = APIRouter()
 
 
-@router.get("/get-character", response_model=CharacterOut, name="vocabulary:get-character")
-async def get_character(
-    character: Annotated[CharacterOut | None, Depends(search.search_character)]
-) -> CharacterOut | Response:
-    if character is None:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"error_message": "Character not found"})
-    return character
-
-
-@router.get("/get-word", response_model=list[WordOut], name="vocabulary:get-word")
-async def get_word(
-    words: Annotated[list[WordOut] | None, Depends(search.search_simplified_word)]
+@router.get("/get-words", response_model=list[WordOut], name="vocabulary:get-words")
+async def get_words(
+    words: Annotated[list[WordOut] | None, Depends(search.search_simplified_words)]
 ) -> list[WordOut] | Response:
     if words is None:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"error_message": "Word not found"})
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"error_message": "Words not found"})
     return words
+
+
+@router.get("/get-characters", response_model=list[CharacterOut], name="vocabulary:get-characters")
+async def get_characters(
+    characters: Annotated[list[CharacterOut], Depends(search.search_characters)]
+) -> list[CharacterOut]:
+    return characters
