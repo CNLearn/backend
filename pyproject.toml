@@ -95,11 +95,12 @@ profile = "black"
 
 [tool.mypy]
 python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
 plugins = [
   "pydantic.mypy",
-  "sqlalchemy.ext.mypy.plugin"
 ]
-exclude = ['alembic', '.venv/']
+exclude = ['.venv/', 'alembic']
 strict = true
 
 [tool.ruff]

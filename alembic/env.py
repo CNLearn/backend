@@ -5,14 +5,14 @@ from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from app.db.base import Base
-from app.models.user import User  # noqa: F401
-from app.models.vocabulary import (  # noqa: F401
-    Character,
-    Word,
-    word_character_association_table,
+from app.db.models.base import Base
+from app.db.models.character import Character as Character
+from app.db.models.combined import (
+    word_character_association_table as word_character_association_table,
 )
-from app.settings.base import settings
+from app.db.models.user import User as User
+from app.db.models.word import Word as Word
+from app.settings.db import db_settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,7 +20,7 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+fileConfig(str(config.config_file_name))
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -35,11 +35,11 @@ target_metadata = Base.metadata
 
 
 def get_url() -> str:
-    return str(settings.SQLALCHEMY_POSTGRES_URI)
+    return str(db_settings.CNLEARN_POSTGRES_URI)
 
 
-def do_run_migrations(connection):
-    def process_revision_directives(context, revision, directives):
+def do_run_migrations(connection) -> None:
+    def process_revision_directives(context, revision, directives) -> None:
         if config.cmd_opts.autogenerate:
             script = directives[0]
             if script.upgrade_ops.is_empty():
@@ -56,7 +56,7 @@ def do_run_migrations(connection):
         context.run_migrations()
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -70,9 +70,6 @@ def run_migrations_offline():
     """
     url = get_url()
 
-    if settings.TESTING:
-        raise Exception("Running testing migrations offline currently not permitted.")
-
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -84,7 +81,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-async def run_migrations_online():
+async def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -92,6 +89,8 @@ async def run_migrations_online():
 
     """
     configuration = config.get_section(config.config_ini_section)
+    if configuration is None:
+        return
     database_url: str = get_url()
     configuration["sqlalchemy.url"] = database_url
     connectable = config.attributes.get("connection", None)

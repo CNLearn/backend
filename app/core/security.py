@@ -4,7 +4,7 @@ from typing import Any, Optional, TypedDict, Union, cast
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
 
-from app.settings.base import settings
+from app.settings.base import app_settings
 
 ALGORITHM = "HS256"
 
@@ -29,15 +29,15 @@ def create_access_token(subject: Union[str, Any], expires_delta: Optional[timede
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes=app_settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode: dict[str, datetime | str] = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, app_settings.SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 def decode_access_token(token: str) -> DecodedTokenType:
     try:
-        decoded_token: dict[str, int | str] = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+        decoded_token: dict[str, int | str] = jwt.decode(token, app_settings.SECRET_KEY, algorithms=[ALGORITHM])
     except (JWTError, ExpiredSignatureError):
         # TODO: log this
         raise

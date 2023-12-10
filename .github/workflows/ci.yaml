@@ -73,11 +73,11 @@ jobs:
           VERSION: ${{ env.app_version }}
           SERVER_NAME: ${{ env.server_name }}
           SERVER_HOST: ${{ env.server_host }}
-          POSTGRES_SERVER: ${{ env.server }}
-          POSTGRES_PORT: ${{ env.pg_port }}
-          POSTGRES_USER: ${{ env.test_pg_user }}
-          POSTGRES_PASSWORD: ${{ env.test_pg_password }}
-          POSTGRES_DB: ${{ env.test_pg_db }}
+          CNLEARN_POSTGRES_SERVER: ${{ env.server }}
+          CNLEARN_POSTGRES_PORT: ${{ env.pg_port }}
+          CNLEARN_POSTGRES_USER: ${{ env.test_pg_user }}
+          CNLEARN_POSTGRES_PASSWORD: ${{ env.test_pg_password }}
+          CNLEARN_POSTGRES_DB: ${{ env.test_pg_db }}
           ENVIRONMENT: ${{ env.environment }}
         run: |
           poetry run pytest -s

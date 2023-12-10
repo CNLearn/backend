@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, Response
 
-from app.models.user import User
+from app.db.models import user as user_model
 
 
 @pytest.mark.asyncio
@@ -30,7 +30,7 @@ async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table:
 async def test_login_access_token(
     client: AsyncClient,
     app: FastAPI,
-    create_user_object: Callable[..., Awaitable[User]],
+    create_user_object: Callable[..., Awaitable[user_model.User]],
     clean_users_table: Callable[[None], None],
 ) -> None:
     email: str = "admin@cnlearn.app"
@@ -72,7 +72,7 @@ async def test_login_access_token_fail(
     )
     assert response.status_code == 400
     json_response: dict[str, Any] = response.json()
-    assert json_response == {"detail": "Incorrect email or password"}
+    assert json_response == {"message": "Incorrect email or password"}
 
 
 @pytest.mark.asyncio
