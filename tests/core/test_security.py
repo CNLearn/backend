@@ -38,7 +38,7 @@ def test_verify_password() -> None:
         pytest.param("vlad", "_i_4m_a_h4ck3r", None, False, pytest.raises(JWTError), id="invalid jwt"),
     ],
 )
-@mock.patch("app.core.security.settings")
+@mock.patch("app.settings.base.app_settings")
 def test_encoding_decoding_tokens(
     # the following comes from our patch
     settings_mock: mock.MagicMock,

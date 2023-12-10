@@ -9,7 +9,7 @@ import orjson
 import structlog
 from structlog.typing import Processor
 
-from app.settings.base import settings
+from ..base import app_settings
 
 
 def configure_logging() -> structlog.BoundLogger:
@@ -22,7 +22,7 @@ def configure_logging() -> structlog.BoundLogger:
     logging.basicConfig(
         format="%(message)s",
     )
-    if settings.ENVIRONMENT == "Development":
+    if app_settings.ENVIRONMENT == "Development":
         logging.getLogger().setLevel(logging.DEBUG)
         structlog.configure(
             processors=common_processors

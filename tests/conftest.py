@@ -10,10 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 import alembic.command
 from alembic.config import Config
-from app.crud.crud_user import user as crud_user
-from app.models.user import User
-from app.schemas.user import UserCreate
-from app.settings.base import settings
+from app.db.crud.user import user_crud
+from app.db.models import user as user_model
+from app.domain.auth import user as user_domain
+from app.settings.db import db_settings
 from tests.fixtures.vocabulary import add_some_words_and_characters
 
 
@@ -63,7 +63,7 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
 @pytest.mark.asyncio
 @pytest.fixture
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    ASYNC_URI: str = str(settings.SQLALCHEMY_POSTGRES_URI)
+    ASYNC_URI: str = str(db_settings.CNLEARN_POSTGRES_URI)
     engine = create_async_engine(ASYNC_URI, echo=False)
     async_session_maker = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with async_session_maker() as async_session:
@@ -75,17 +75,17 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 async def clean_users_table(get_async_session: AsyncSession) -> AsyncGenerator[None, None]:
     yield
     db: AsyncSession = get_async_session
-    await db.execute(delete(User))
+    await db.execute(delete(user_model.User))
     await db.commit()
 
 
 @pytest.mark.asyncio
 @pytest.fixture
-async def create_user_object(get_async_session: AsyncSession) -> Callable[..., Awaitable[User]]:
-    async def _create_user(email: str, password: str, full_name: Optional[str] = None) -> User:
+async def create_user_object(get_async_session: AsyncSession) -> Callable[..., Awaitable[user_model.User]]:
+    async def _create_user(email: str, password: str, full_name: Optional[str] = None) -> user_model.User:
         db: AsyncSession = get_async_session
-        user_in = UserCreate(password=password, email=email, full_name=full_name)
-        new_user = await crud_user.create(db, obj_in=user_in)
+        user_in = user_domain.UserCreate(password=password, email=email, full_name=full_name)
+        new_user = await user_crud.create(db, obj_in=user_in)
         return new_user
 
     return _create_user
@@ -95,7 +95,7 @@ async def create_user_object(get_async_session: AsyncSession) -> Callable[..., A
 @pytest.fixture
 async def return_logged_in_user_bearer_token(
     get_async_session: AsyncSession,
-    create_user_object: Callable[..., Awaitable[User]],
+    create_user_object: Callable[..., Awaitable[user_model.User]],
     client: AsyncClient,
     app: FastAPI,
 ) -> Callable[..., Awaitable[str]]:
