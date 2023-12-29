@@ -32,6 +32,3 @@ def create_application() -> FastAPI:
     app.include_router(v1.api_router, prefix=app_settings.API_V1_STR)
     app.add_exception_handler(CNLearnWithMessage, cnlearn_exception_handler)  # pyright: ignore[reportUnknownMemberType]
     return app
-
-
-app: FastAPI = create_application()
