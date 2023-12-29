@@ -18,6 +18,7 @@ def create_application() -> FastAPI:
         title=app_settings.APP_NAME,
         version=app_settings.VERSION,
         lifespan=lifespan,
+        exception_handlers={CNLearnWithMessage: cnlearn_exception_handler},
     )
     logger = configure_logging()
     # change CORS settings
@@ -30,5 +31,4 @@ def create_application() -> FastAPI:
     )
     app.add_middleware(AccessLogger, logger=logger)
     app.include_router(v1.api_router, prefix=app_settings.API_V1_STR)
-    app.add_exception_handler(CNLearnWithMessage, cnlearn_exception_handler)  # pyright: ignore[reportUnknownMemberType]
     return app
