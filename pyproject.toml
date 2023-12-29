@@ -28,6 +28,7 @@ uvicorn = "^0.24.0"
 structlog = "^23.1.0"
 orjson = "^3.9.2"
 pydantic-settings = "^2.0.2"
+jieba = "^0.42.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
@@ -102,6 +103,12 @@ plugins = [
 ]
 exclude = ['.venv/', 'alembic']
 strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "jieba",
+]
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 120

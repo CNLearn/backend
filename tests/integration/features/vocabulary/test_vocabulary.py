@@ -52,3 +52,20 @@ async def test_search_character(
     assert response.status_code == 200
     assert json_response[0]["character"] == "鸦"
     assert len(json_response[0]["words"]) == n_words
+
+
+@pytest.mark.asyncio
+async def test_search_phrase(
+    client: AsyncClient,
+    app: FastAPI,
+) -> None:
+    search_url: str = app.url_path_for("vocabulary:search-phrase")
+    query_params: dict[str, str] = {"phrase": "鸦雀无声lala  hoho hihi鸦雀无声"}
+    search_url += "?" + urlencode(query_params)
+    response: Response = await client.get(
+        url=search_url,
+    )
+    json_response: dict[str, Any] = response.json()
+    assert response.status_code == 200
+    assert len(json_response["words"]) == 1
+    assert list(sorted(json_response["not_found"])) == ["hihi", "hoho", "lala"]

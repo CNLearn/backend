@@ -2,6 +2,7 @@ from typing import Callable, Optional, Sequence
 from unittest import mock
 
 import pytest
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.crud.user import user_crud
@@ -17,6 +18,9 @@ async def test_user_crud(
     mocked_verify_password: mock.MagicMock,
     get_async_session: AsyncSession,
     user_schema: Callable[..., user_domain.UserCreate],
+    # the following are root conftest fixtures
+    client: AsyncClient,
+    clean_users_table: Callable[[None], None],
 ) -> None:
     # let's first call user get with nothing in there
     no_user: Optional[user_model.User] = await user_crud.get(get_async_session, id=1)

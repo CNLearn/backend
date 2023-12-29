@@ -22,6 +22,10 @@ def configure_logging() -> structlog.BoundLogger:
     logging.basicConfig(
         format="%(message)s",
     )
+    jieba_logger = logging.getLogger("jieba")
+    jieba_logger.handlers = []
+    jieba_logger.propagate = False
+
     if app_settings.ENVIRONMENT == "Development":
         logging.getLogger().setLevel(logging.DEBUG)
         structlog.configure(
