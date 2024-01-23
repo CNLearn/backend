@@ -1,6 +1,7 @@
 """
 This module contains the dictConfig based logging for uvicorn.
 """
+
 from typing import Any
 
 uvicorn_logging_config: dict[str, Any] = {

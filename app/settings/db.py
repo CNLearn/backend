@@ -1,6 +1,7 @@
 """
 This module contains the database settings for CNLearn.
 """
+
 from pydantic import PostgresDsn, computed_field
 
 from .core import CNLearnBaseSettings, CNLearnSettings

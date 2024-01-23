@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import exceptions, security
 from app.db.crud import user
+from app.domain.auth import token as token_domain
 from app.domain.auth import user as user_domain
-from app.domain.auth.token import TokenPayload
 
 
 async def get_current_user(db: AsyncSession, token: str) -> user_domain.User:
@@ -18,8 +18,8 @@ async def get_current_user(db: AsyncSession, token: str) -> user_domain.User:
             message="Could not validate credentials",
         )
     try:
-        token_data = TokenPayload(sub=int(payload["sub"]))
-    except ValidationError:
+        token_data = token_domain.TokenPayload(sub=int(payload.sub))
+    except (ValidationError, ValueError):
         raise exceptions.CNLearnWithMessage(
             status_code=status.HTTP_403_FORBIDDEN,
             message="Could not validate credentials",

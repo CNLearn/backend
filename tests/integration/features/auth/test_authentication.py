@@ -19,6 +19,7 @@ async def test_create_user(client: AsyncClient, app: FastAPI, clean_users_table:
         },
     )
     json_response: dict[str, Any] = response.json()
+    print(json_response)
     assert json_response["email"] == "unique@email.com"
     assert json_response["is_active"] is True
     assert json_response["is_superuser"] is False

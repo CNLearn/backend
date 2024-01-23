@@ -1,0 +1,10 @@
+[report]
+omit =
+    # ignoring some files that are for configuration purposes
+    app/server.py
+    app/settings/logging/structlog.py
+    app/settings/logging/uvicorn.py
+    app/settings/core.py
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:

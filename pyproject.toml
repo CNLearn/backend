@@ -16,31 +16,32 @@ alembic = "^1.13.1"
 asyncpg = "^0.29.0"
 bcrypt = "^4.1.2"
 email-validator = "^2.1.0.post1"
-fastapi = "^0.108.0"
+fastapi = "^0.109.0"
 httpx = "^0.26.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-psycopg = "^3.1.16"
-pydantic = "^2.5.3"
+psycopg = "^3.1.17"
+pydantic = "^2.6.0"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.6"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.24"}
-uvicorn = "^0.25.0"
-structlog = "^23.3.0"
-orjson = "^3.9.10"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+uvicorn = "^0.27.0.post1"
+structlog = "^24.1.0"
+orjson = "^3.9.12"
 pydantic-settings = "^2.1.0"
 jieba = "^0.42.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.12.1"
+black = "^24.1.1"
 pre-commit = "^3.6.0"
 mypy = "^1.8.0"
 mypy-extensions = "^1.0.0"
-types-passlib = "^1.7.7.13"
-types-python-jose = "^3.3.4.8"
+types-passlib = "^1.7.7.20240106"
+types-python-jose = "^3.3.4.20240106"
 isort = "^5.13.2"
-ruff = "^0.1.9"
-ipython = "^8.19.0"
+ruff = "^0.2.0"
+ipython = "^8.21.0"
 rich = "^13.7.0"
+pyright = "^1.1.349"
 
 [tool.poetry.group.test.dependencies]
 asgi_lifespan = "^2.1.0"
@@ -59,6 +60,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 minversion = "7.0"
 asyncio_mode = "auto"
+#addopts = "--cov=app --cov-report=term-missing"
 addopts = "--cov=app --cov-report=lcov:cov.info"
 
 [tool.coverage.run]
