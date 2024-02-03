@@ -18,7 +18,7 @@ async def test_search_word(
         url=search_url,
     )
     json_response: list[dict[str, Any]] = response.json()
-
+    print(json_response)
     assert response.status_code == 200
     assert len(json_response) == 1
     assert json_response[0]["simplified"] == "鸦雀无声"

@@ -1,20 +1,16 @@
 from datetime import datetime, timedelta
-from typing import Any, Optional, TypedDict, Union, cast
+from typing import Any, Optional, Union, cast
 
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
 
+from app.domain.auth import token as token_domain
 from app.settings.base import app_settings
 
 ALGORITHM = "HS256"
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-class DecodedTokenType(TypedDict):
-    exp: int
-    sub: str
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -35,7 +31,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: Optional[timede
     return encoded_jwt
 
 
-def decode_access_token(token: str) -> DecodedTokenType:
+def decode_access_token(token: str) -> token_domain.DecodedTokenType:
     try:
         decoded_token: dict[str, int | str] = jwt.decode(token, app_settings.SECRET_KEY, algorithms=[ALGORITHM])
     except (JWTError, ExpiredSignatureError):
@@ -43,4 +39,4 @@ def decode_access_token(token: str) -> DecodedTokenType:
         raise
     exp: int = cast(int, decoded_token["exp"])
     sub: str = cast(str, decoded_token["sub"])
-    return DecodedTokenType(exp=exp, sub=sub)
+    return token_domain.DecodedTokenType(exp=exp, sub=sub)

@@ -28,4 +28,4 @@ class Word(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<Word(simplified='{self.simplified}', pinyin='{self.pinyin_accent})'>"
+        return f"<Word(simplified='{self.simplified}', pinyin='{self.pinyin_accent}')>"

@@ -3,6 +3,7 @@ This module contains the logging settings for both the uvicorn server
 as well as the structlog configuration that's used in both the FastAPI
 logging middleware and separate loggers for the various modules.
 """
+
 import logging
 
 import orjson

@@ -57,4 +57,4 @@ def test_encoding_decoding_tokens(
         sleep(expires_delta.microseconds)
     with expectation:
         payload = decode_access_token(encoded_token + additional_string)
-        assert payload["sub"] == subject
+        assert payload.sub == subject
