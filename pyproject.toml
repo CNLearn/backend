@@ -45,7 +45,7 @@ pyright = "^1.1.349"
 
 [tool.poetry.group.test.dependencies]
 asgi_lifespan = "^2.1.0"
-pytest = "^7.4.3"
+pytest = "^8.0.0"
 pytest_asyncio = "^0.23.2"
 pytest-cov = "^4.1.0"
 
