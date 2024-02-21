@@ -11,7 +11,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 alembic = "^1.13.1"
 asyncpg = "^0.29.0"
 bcrypt = "^4.1.2"
@@ -19,20 +19,20 @@ email-validator = "^2.1.0.post1"
 fastapi = "^0.109.0"
 httpx = "^0.26.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-psycopg = "^3.1.17"
-pydantic = "^2.6.0"
+psycopg = "^3.1.18"
+pydantic = "^2.6.1"
 python-jose = "^3.3.0"
 python-multipart = "^0.0.9"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.27"}
 uvicorn = "^0.27.0-post.0"
 structlog = "^24.1.0"
-orjson = "^3.9.12"
-pydantic-settings = "^2.1.0"
+orjson = "^3.9.14"
+pydantic-settings = "^2.2.1"
 jieba = "^0.42.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
-pre-commit = "^3.6.0"
+black = "^24.2.0"
+pre-commit = "^3.6.2"
 mypy = "^1.8.0"
 mypy-extensions = "^1.0.0"
 types-passlib = "^1.7.7.20240106"
@@ -41,11 +41,11 @@ isort = "^5.13.2"
 ruff = "^0.2.0"
 ipython = "^8.21.0"
 rich = "^13.7.0"
-pyright = "^1.1.349"
+pyright = "^1.1.351"
 
 [tool.poetry.group.test.dependencies]
 asgi_lifespan = "^2.1.0"
-pytest = "^8.0.0"
+pytest = "^8.0.1"
 pytest_asyncio = "^0.23.2"
 pytest-cov = "^4.1.0"
 
@@ -72,7 +72,7 @@ omit = [
 
 [tool.black]
 line-length = 120
-target-version = ['py311']
+target-version = ['py312']
 exclude = '''
 
 (
@@ -97,7 +97,7 @@ exclude = '''
 profile = "black"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 plugins = [
