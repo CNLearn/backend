@@ -59,7 +59,7 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Run ruff for linting
-        run: poetry run ruff .
+        run: poetry run ruff check .
 
       - name: Run black --check .
         run: poetry run black --check .
